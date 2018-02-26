@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>猫狗识别应用, powered by 黄伟亮</title>
+</head>
+<style>
+    .file-box{ position:relative;width:100%;text-align: center; }
+    .txt{ height:22px; border:1px solid #cdcdcd; width:180px;}
+    .btn{ background-color:#FFF; border:1px solid #CDCDCD;height:24px; width:70px;}
+    .file{display:none;}
+    #container{margin:auto;width: 50%;}
+    .title{text-align: center; padding:20px; font-weight: bold; font-size:60px;}
+    #content, #info{text-align: center; padding: 10px;}
+</style>
+<body>
+    <div id="container">
+        <div class="title">
+            <span >猫狗识别程序</span>
+        </div>
+        <div class="file-box">
+            <form id="uploadForm" action="javascript:void(0)" method="post" enctype="multipart/form-data">
+                <input type='text' name='textfield' id='textfield' class='txt' />
+                <input id="getFile" type='button' class='btn' value='浏览...' />
+                <input type="file" name="file" class="file" id="fileField" size="28" accept="image/jpeg, image/x-png, image/x-portablebitmap" onchange="document.getElementById('textfield').value=this.value.split('\\')[2]" />
+                <input id="upload" type="submit" name="submit" class="btn" value="识别" />
+            </form>
+        </div>
+        <span id="info"></span>
+        <div id="content">
+        </div>
+
+    </div>
+</body>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    $(function () {
+        $('#getFile').click(function () {
+            $('#fileField').click();
+        });
+        $('#upload').click(function () {
+            $('#info').html('正在识别中...');
+            $('#content').empty();
+            $.ajax({
+                url: '/upload',　　　　　　　　　　//上传地址
+                type: 'POST',
+                cache: false,　　
+                data: new FormData($('#uploadForm')[0]),　　　　　　　　　　　　　//表单数据
+                processData: false,
+                contentType: false,
+                success:function(data){
+                    console.log(data);
+                    var obj = JSON.parse(data);
+                    var img = $('<img/>');
+                    img.attr('src',obj.imgPath);
+                    img.appendTo($('#content'));
+                    img.width('100%');
+                    var prob = parseFloat(obj.result);
+                    var rs = null;
+                    if(prob>0.7){
+                        rs = '图像中'+(prob*100).toFixed(2)+'%的可能是一只狗';
+                    }else if(prob<0.3){
+                        rs = '图像中'+((1-prob)*100).toFixed(2)+'%的可能是一只猫';
+                    }else{
+                        rs = '图像中可能既有狗也有猫';
+                    }
+                    $('#info').html(rs);
+                }
+            });
+        })
+    })
+</script>
+</html>
