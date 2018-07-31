@@ -1,1 +1,0 @@
-use for store pic

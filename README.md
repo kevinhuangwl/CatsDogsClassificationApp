@@ -1,1 +1,3 @@
-# mlnd-graduation
+# 猫狗识别应用
+
+本项目为Udacity机器学习课程毕业项目。
